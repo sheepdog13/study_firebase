@@ -1,28 +1,27 @@
 import { async } from "@firebase/util";
 import { useState } from "react";
 import { firebaseAuth , signInWithEmailAndPassword, onAuthStateChanged } from "../Firebase";
+import { addDoc, collection, doc, getDocs, setDoc } from "firebase/firestore"
+import { db } from "../Firebase";
+
 
 const SignIn = () => {
     const [typingEmail,setTypingEmail] = useState("");
     const [typingPassword,setTypingPassword] = useState("");
+    const usersCollectionRef = collection(db, "users")
 
+    const createUser = async () => {
+        const userCredential = await signInWithEmailAndPassword(firebaseAuth, typingEmail, typingPassword)
+        const user = userCredential.user
+        await setDoc(doc(db, "users", user.uid), {uid : user.uid});
+    }
     const login = (e) =>{
         e.preventDefault();
-        signInWithEmailAndPassword(firebaseAuth, typingEmail, typingPassword)
-  .then((userCredential) => {
-    // Signed in 
-    const user = userCredential.user;
-    console.log(user.uid);
+        createUser();
     // ...
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    console.log(errorCode)
-    console.log(errorMessage)
-
-  });
     }
+
+    
     
         
     return (  
